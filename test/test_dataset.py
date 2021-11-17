@@ -17,7 +17,5 @@ class TestDataset(unittest.TestCase):
 
             )
         )
-        elem = dataset[0]
-        print(elem[1][0].sum())
-        print(elem[1][1].sum())
-        print(elem[1][2].sum())
+        for i in range(len(dataset)):
+            _ = dataset[i]

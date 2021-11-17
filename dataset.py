@@ -44,12 +44,15 @@ class CocoDataset(Dataset):
         :return: List[Tensor[13*13*"len(anchors[0])"*num_classes+5], Tensor[26*26*"len(anchors[1])"*num_classes+5]],
         Tensor[52*52*"len(anchors[0])"*num_classes+5]
         """
-        image_idx = self.coco.getImgIds()[idx]
+        image_idx = int(np.random.choice(self.coco.getImgIds()))
         image_info = self.coco.loadImgs(image_idx)[0]
         path_to_image = os.path.join(self.path_to_data, image_info['file_name'])
         image = read_image(path_to_image)
 
-        anns = self.coco.loadAnns(self.coco.getAnnIds(image_idx))
+        anns = self.coco.loadAnns(self.coco.getAnnIds(imgIds=image_idx))
+        if not anns:
+            return self.__getitem__(idx)
+
         bboxes = []
         labels = []
 
