@@ -38,7 +38,7 @@ class CocoDataset(Dataset):
         self.transforms = transforms
         self.coco = COCO(self.path_to_annotations)
 
-    def __getitem__(self, idx: int) -> Tuple[np.ndarray, List[np.ndarray]]:
+    def __getitem__(self, idx: int) -> Tuple[np.ndarray, List[torch.Tensor]]:
         """
         image [3x416x416] target
         :return: List[Tensor[13*13*"len(anchors[0])"*num_classes+5], Tensor[26*26*"len(anchors[1])"*num_classes+5]],
@@ -70,8 +70,8 @@ class CocoDataset(Dataset):
 
         bboxes[..., 0] += bboxes[..., 2] // 2
         bboxes[..., 1] += bboxes[..., 3] // 2
-        bboxes[..., 2] /= image.shape[0]
-        bboxes[..., 3] /= image.shape[1]
+        bboxes[..., 2] /= image.shape[1]
+        bboxes[..., 3] /= image.shape[0]
 
         flattened_anchors = self.anchors.reshape(-1, 2).float()  # for iou calculating
 
@@ -82,7 +82,7 @@ class CocoDataset(Dataset):
         iou_idxs = torch.argmax(iou_bbox_anchors, dim=1)
 
         target_list = [
-            torch.zeros(grid, grid, self.num_anchors, 6).float() for grid in self.grid_size
+            torch.zeros(self.num_anchors, grid, grid, 6).float() for grid in self.grid_size
             # 6 = 1 (objectness) + 4 (coords) + 1 (class)
         ]  # list of targets for each scale
 
@@ -91,12 +91,15 @@ class CocoDataset(Dataset):
             anchor_idx = idx % self.anchors.shape[1]
             cell_size = self.cell_size[scale_idx]
             bbox = bboxes[i]
+            anchor = self.anchors[scale_idx, anchor_idx]
+
             x_bbox, y_bbox = (bbox[0] % cell_size) / cell_size, (bbox[1] % cell_size) / cell_size
-            target_cell = torch.tensor([1, x_bbox, y_bbox, bbox[2], bbox[3], labels[i]])
+            w_bbox, h_bbox = bbox[2] / anchor[0], bbox[3] / anchor[1]
 
-            cell_x, cell_y = bbox[0] // cell_size, bbox[1] // cell_size
+            target_cell = torch.tensor([1., x_bbox, y_bbox, w_bbox, h_bbox, labels[i]])
 
-            target_list[int(scale_idx)][int(cell_y), int(cell_x), int(anchor_idx)] = target_cell
+            cell_x, cell_y = int(bbox[0] / cell_size), int(bbox[1] / cell_size)
+            target_list[int(scale_idx)][int(anchor_idx), cell_y, cell_x] = target_cell
 
         return image, target_list
 
