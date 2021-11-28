@@ -38,7 +38,7 @@ class CocoDataset(Dataset):
         self.transforms = transforms
         self.coco = COCO(self.path_to_annotations)
 
-    def __getitem__(self, idx: int) -> Tuple[np.ndarray, List[torch.Tensor]]:
+    def __getitem__(self, idx: int) -> Tuple[np.ndarray or torch.Tensor, List[torch.Tensor]]:
         """
         image [3x416x416] target
         :return: List[Tensor[13*13*"len(anchors[0])"*num_classes+5], Tensor[26*26*"len(anchors[1])"*num_classes+5]],
