@@ -41,7 +41,10 @@ class Darknet53(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        # [52, 52, 256]
         x1 = self.layer3(self.layer2(self.layer1(self.first_block(x))))
+        # [26, 26, 512]
         x2 = self.layer4(x1)
+        # [13, 13, 1024]
         x3 = self.layer5(x2)
         return [x1, x2, x3]

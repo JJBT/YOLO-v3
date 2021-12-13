@@ -1,0 +1,11 @@
+version: "3.0"
+
+services:
+    yolo:
+        image: "yolo"
+#        user: 1001:100
+        entrypoint: /bin/bash
+        volumes:
+            - /home/vladimir/dev/YOLO-v3:/opt/project
+            - /home/vladimir/dev/data:/data
+        env_file: .env

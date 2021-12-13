@@ -7,4 +7,5 @@ tensorboard==2.6.0
 accelerate==0.5.1
 albumentations==1.1.0
 packaging==21.0
-git+https://github.com/JJBT/HypeTrainer.git
+wandb==0.12.7
+pytest==6.2.5

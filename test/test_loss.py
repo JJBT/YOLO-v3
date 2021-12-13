@@ -14,8 +14,8 @@ unittest.TestLoader.sortTestMethodsUsing = None
 class TestLoss(unittest.TestCase):
     def test_loss_1(self):
         dataset = CocoDataset(
-            path_to_annotations='/home/vladimir/dev/data/coco/annotations/instances_val2017.json',
-            path_to_data='/home/vladimir/dev/data/coco/images/val2017',
+            path_to_annotations='/data/coco/annotations/instances_val2017.json',
+            path_to_data='/data/coco/images/val2017',
             transforms=
             albumentations.Compose(
                 [albumentations.Resize(416, 416)],
